@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منظومة إدارة المدرسة العراقية</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #e2e8f0;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-area, #printable-area * {
+                visibility: visible;
+            }
+            #printable-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white;
+                color: black;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen m-0 p-0 sm:py-6">
+
+    <!-- Mobile App Container -->
+    <div class="w-full sm:max-w-[430px] h-screen sm:h-[860px] bg-[#f8fafc] sm:rounded-[40px] sm:shadow-2xl flex flex-col justify-between relative overflow-hidden border-0 sm:border-[8px] sm:border-[#1e293b]">
+        
+        <!-- Top Dynamic Header -->
+        <div id="app-header" class="bg-[#0f2c59] text-white px-6 pt-10 pb-6 rounded-b-[30px] shadow-md transition-all duration-300 flex flex-col justify-between relative overflow-hidden flex-shrink-0">
+            <div class="absolute -left-10 -bottom-10 opacity-10 text-9xl pointer-events-none">
+                <i id="header-bg-icon" class="fa-solid fa-graduation-cap"></i>
+            </div>
+            <div class="flex justify-between items-start z-10">
+                <div class="w-12 h-12 rounded-2xl bg-amber-400/20 flex items-center justify-center border border-amber-400/30">
+                    <i id="header-main-icon" class="fa-solid fa-graduation-cap text-amber-400 text-xl"></i>
+                </div>
+                <div class="text-[11px] bg-white/10 px-3 py-1 rounded-full text-slate-200 font-semibold backdrop-blur-sm">
+                    نسخة المعلم الذكي v4.0
+                </div>
+            </div>
+            <div class="mt-4 z-10">
+                <h1 id="header-title" class="text-xl font-bold tracking-tight">الصفوف والطلاب</h1>
+                <p id="header-subtitle" class="text-xs text-slate-300 mt-1 leading-relaxed">إدارة قيود التلاميذ والصفوف والتقارير الأكاديمية الشاملة</p>
+            </div>
+        </div>
+
+        <!-- Scrollable Content Area -->
+        <div id="app-content" class="flex-1 overflow-y-auto px-4 py-5 no-scrollbar pb-28">
+            <!-- Dynamic content injected via JS -->
+        </div>
+
+        <!-- Bottom Navigation Bar (5 Tabs) -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2.5 flex justify-between items-center z-30 shadow-[0_-4px_16px_rgba(0,0,0,0.08)] flex-shrink-0">
+            
+            <!-- Tab 0: الإعدادات -->
+            <button onclick="switchTab(0)" id="tab-0" class="flex flex-col items-center flex-1 py-1 transition-all text-slate-500 hover:text-[#0f2c59]">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-gear text-lg"></i>
+                </div>
+                <span class="text-[10px] font-bold mt-0.5 truncate w-full text-center">الإعدادات</span>
+            </button>
+
+            <!-- Tab 1: الصفوف والطلاب -->
+            <button onclick="switchTab(1)" id="tab-1" class="flex flex-col items-center flex-1 py-1 transition-all text-[#0f2c59]">
+                <div class="w-9 h-9 rounded-xl bg-[#0f2c59]/10 flex items-center justify-center transition-all scale-105">
+                    <i class="fa-solid fa-graduation-cap text-lg"></i>
+                </div>
+                <span class="text-[10px] font-bold mt-0.5 truncate w-full text-center">الصفوف والطلاب</span>
+            </button>
+
+            <!-- Tab 2: السلوك والمتابعة -->
+            <button onclick="switchTab(2)" id="tab-2" class="flex flex-col items-center flex-1 py-1 transition-all text-slate-500 hover:text-[#0f2c59]">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-star text-lg"></i>
+                </div>
+                <span class="text-[10px] font-bold mt-0.5 truncate w-full text-center">السلوك والمتابعة</span>
+            </button>
+
+            <!-- Tab 3: جدول الحصص -->
+            <button onclick="switchTab(3)" id="tab-3" class="flex flex-col items-center flex-1 py-1 transition-all text-slate-500 hover:text-[#0f2c59]">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-calendar-days text-lg"></i>
+                </div>
+                <span class="text-[10px] font-bold mt-0.5 truncate w-full text-center">جدول الحصص</span>
+            </button>
+
+            <!-- Tab 4: الحضور والغياب -->
+            <button onclick="switchTab(4)" id="tab-4" class="flex flex-col items-center flex-1 py-1 transition-all text-slate-500 hover:text-[#0f2c59]">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-calendar-check text-lg"></i>
+                </div>
+                <span class="text-[10px] font-bold mt-0.5 truncate w-full text-center">الحضور والغياب</span>
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Printable container hidden on screen -->
+    <div id="printable-area" class="hidden"></div>
+
+    <!-- Interactive Action Modal / Form Dialog -->
+    <div id="action-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl p-6 shadow-2xl transform scale-95 transition-transform duration-300 flex flex-col max-h-[90vh]" id="modal-box">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                <div class="flex items-center gap-3">
+                    <div id="modal-icon-wrapper" class="w-10 h-10 rounded-2xl bg-indigo-50 text-[#0f2c59] flex items-center justify-center text-lg">
+                        <i id="modal-icon" class="fa-solid fa-plus"></i>
+                    </div>
+                    <h3 id="modal-title" class="font-bold text-slate-800 text-base">نافذة الإجراء</h3>
+                </div>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center transition-colors">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="modal-body" class="overflow-y-auto no-scrollbar flex-1 py-2">
+                <!-- Dynamic form inputs injected here -->
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex gap-3">
+                <button onclick="closeModal()" class="flex-1 bg-slate-100 text-slate-700 py-2.5 rounded-2xl font-bold text-xs hover:bg-slate-200 transition-colors">إغلاق</button>
+                <button id="modal-submit-btn" onclick="handleModalSubmit()" class="flex-1 bg-[#0f2c59] text-white py-2.5 rounded-2xl font-bold text-xs shadow-lg shadow-blue-900/20 hover:bg-[#163a71] transition-colors">حفظ البيانات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Toast Notification -->
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md text-white px-5 py-3 rounded-2xl shadow-xl text-xs font-semibold z-50 opacity-0 pointer-events-none transition-all duration-300 transform -translate-y-4 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-msg">تمت العملية بنجاح</span>
+    </div>
+
+    <script>
+        // --- Application State ---
+        let appState = {
+            classes: [
+                { id: 1, name: "الأول المتوسط", section: "أ" },
+                { id: 2, name: "الأول المتوسط", section: "ب" },
+                { id: 3, name: "الثاني المتوسط", section: "أ" }
+            ],
+            students: [
+                { id: 1, name: "أحمد محمد كريم", phone: "07712345678", class: "الأول المتوسط", section: "أ" },
+                { id: 2, name: "حسين علي جاسم", phone: "07823456789", class: "الأول المتوسط", section: "أ" },
+                { id: 3, name: "زينب عباس حسن", phone: "07934567890", class: "الأول المتوسط", section: "أ" },
+                { id: 4, name: "سجاد كاظم عبد", phone: "07745678901", class: "الأول المتوسط", section: "ب" },
+                { id: 5, name: "فاطمة مهدي صالح", phone: "07856789012", class: "الثاني المتوسط", section: "أ" }
+            ],
+            subjects: [
+                { id: 1, name: "اللغة العربية", class: "الأول المتوسط", teacher: "أستاذ محمد" },
+                { id: 2, name: "اللغة الإنكليزية", class: "الثاني المتوسط", teacher: "أستاذة سارة" },
+                { id: 3, name: "الرياضيات", class: "الأول المتوسط", teacher: "أستاذ حيدر" }
+            ],
+            schedule: [
+                { day: "الأحد", period: 1, subject: "اللغة العربية", className: "الأول المتوسط (أ)", time: "08:00 - 08:45", hall: "قاعة 1" },
+                { day: "الأحد", period: 2, subject: "اللغة العربية", className: "الأول المتوسط (ب)", time: "08:50 - 09:35", hall: "قاعة 2" },
+                { day: "الأحد", period: 3, subject: "اللغة الإنكليزية", className: "الثاني المتوسط (أ)", time: "09:40 - 10:25", hall: "قاعة 3" },
+                { day: "الإثنين", period: 1, subject: "الرياضيات", className: "الأول المتوسط (أ)", time: "08:00 - 08:45", hall: "قاعة 1" }
+            ],
+            attendanceSessions: [
+                {
+                    id: "session_demo_1",
+                    date: "2026-10-01",
+                    class: "الأول المتوسط",
+                    section: "أ",
+                    subject: "اللغة العربية",
+                    records: { 1: "present", 2: "absent", 3: "present" }
+                }
+            ],
+            behaviorRecords: [
+                { id: 1, studentId: 1, stars: 5, rating: "ممتاز ومشارك متفاعل", date: "2026-09-28" },
+                { id: 2, studentId: 2, stars: 2, rating: "تشتت أثناء الدرس", date: "2026-09-29" }
+            ],
+            individualNotes: [
+                { id: 1, studentId: 1, type: "متميز / شاطر", text: "تفوق ملحوظ في إلقاء القصيدة والواجبات", date: "2026-09-29" },
+                { id: 2, studentId: 2, type: "يحتاج متابعة", text: "كثرة السرحان وتكرار الغياب بدون عذر", date: "2026-09-30" }
+            ]
+        };
+
+        let activeTabIndex = 1;
+        let currentModalType = "";
+        let editingClassId = null;
+        let attendanceSubTab = 'register'; // 'register' or 'report'
+
+        // --- Tabs Data Configuration ---
+        const tabsData = [
+            {
+                index: 0,
+                title: "الإعدادات والتراخيص",
+                subtitle: "النسخ الاحتياطي والتراخيص والدعم الفني",
+                icon: "fa-gear",
+                cards: [
+                    { title: "النسخ الاحتياطي السحابي", desc: "رفع واسترجاع محلي وسحابي مع حفظ الترخيص", icon: "fa-cloud-arrow-up", iconBg: "bg-emerald-50 text-emerald-600", badge: "☁", badgeBg: "bg-emerald-100 text-emerald-800", action: "settings_backup" },
+                    { title: "تفعيل الترخيص والاشتراك", desc: "نظام التشفير وفك الأكواد والقفل الكلي", icon: "fa-key", iconBg: "bg-amber-50 text-amber-600", badge: "🔑", badgeBg: "bg-amber-100 text-amber-800", action: "settings_license" },
+                    { title: "الدعم الفني وواتساب", desc: "الاتصال المباشر وواتساب لشراء الأكواد والدعم", icon: "fa-headset", iconBg: "bg-teal-50 text-teal-600", badge: "☎", badgeBg: "bg-teal-100 text-teal-800", action: "settings_support" }
+                ]
+            },
+            {
+                index: 1,
+                title: "الصفوف والطلاب",
+                subtitle: "إدارة قيود التلاميذ والصفوف والتقارير وإضبارة الطالب",
+                icon: "fa-graduation-cap",
+                cards: [
+                    { title: "إدارة الصفوف والشعب", desc: "إضافة، تعديل، وحذف الصفوف والشعب وإحصائيات القيد", icon: "fa-book", iconBg: "bg-indigo-50 text-indigo-600", badge: "📘", badgeBg: "bg-indigo-100 text-indigo-800", action: "manage_classes" },
+                    { title: "سجل الطلاب", desc: "إضافة طالب بالاسم الرباعي، رقم الهاتف، والمرحلة", icon: "fa-user-check", iconBg: "bg-emerald-50 text-emerald-600", badge: "✔", badgeBg: "bg-emerald-100 text-emerald-800", action: "add_student" },
+                    { title: "اضبارة الطالب", desc: "تقرير مفصل عن غيابات وسلوك وملاحظات الطالب مع الطباعة والبحث", icon: "fa-id-card", iconBg: "bg-amber-50 text-amber-600", badge: "📄", badgeBg: "bg-amber-100 text-amber-800", action: "student_dossier" },
+                    { title: "استيراد وتصدير الأسماء", desc: "إدخال أسماء طلاب دفعة واحدة إلى النظام بكل سهولة", icon: "fa-right-left", iconBg: "bg-teal-50 text-teal-600", badge: "⇄", badgeBg: "bg-teal-100 text-teal-800", action: "import_students" },
+                    { title: "إضافة مادة دراسية", desc: "إضافة مادة دراسية جديدة وربطها بمرحلة وشعبة", icon: "fa-book-bookmark", iconBg: "bg-rose-50 text-rose-700", badge: "📖", badgeBg: "bg-rose-100 text-rose-800", action: "add_subject" }
+                ]
+            },
+            {
+                index: 2,
+                title: "السلوك والمتابعة",
+                subtitle: "رصد تقييم السلوك، الملاحظات الفردية، وكشف المتابعة الشامل",
+                icon: "fa-star",
+                cards: [
+                    { title: "تقييم السلوك", desc: "رصد درجات وتقييم الانضباط الصفي حسب المرحلة والشعبة", icon: "fa-star", iconBg: "bg-amber-50 text-amber-600", badge: "★", badgeBg: "bg-amber-100 text-amber-800", action: "behavior_eval" },
+                    { title: "الملاحظات الفردية", desc: "إضافة وتوثيق ملاحظة فردية عن طالب محدد وتصنيفها", icon: "fa-user-pen", iconBg: "bg-emerald-50 text-emerald-600", badge: "📝", badgeBg: "bg-emerald-100 text-emerald-800", action: "individual_notes" },
+                    { title: "كشف المتابعة الشامل", desc: "تقرير شامل عن سلوك وملاحظات كل طالب حسب المرحلة والشعبة", icon: "fa-chart-pie", iconBg: "bg-purple-50 text-purple-600", badge: "📊", badgeBg: "bg-purple-100 text-purple-800", action: "comprehensive_report" }
+                ]
+            },
+            {
+                index: 3,
+                title: "جدول حصص الأستاذ",
+                subtitle: "إدخال وتعديل الحصص للأستاذ وحسب الأيام والساعات",
+                icon: "fa-calendar-days",
+                isSchedule: true,
+                cards: []
+            },
+            {
+                index: 4,
+                title: "الحضور والغياب",
+                subtitle: "تسجيل وتعديل جلسات الحضور وإعداد تقارير الغياب للطباعة",
+                icon: "fa-calendar-check",
+                isAttendance: true,
+                cards: []
+            }
+        ];
+
+        // --- Tab Switching Logic ---
+        function switchTab(index) {
+            activeTabIndex = index;
+            const data = tabsData[index];
+
+            document.getElementById('header-title').innerText = data.title;
+            document.getElementById('header-subtitle').innerText = data.subtitle;
+            document.getElementById('header-main-icon').className = `fa-solid ${data.icon} text-amber-400 text-xl`;
+            document.getElementById('header-bg-icon').className = `fa-solid ${data.icon}`;
+
+            for (let i = 0; i < 5; i++) {
+                const btn = document.getElementById(`tab-${i}`);
+                const iconDiv = btn.querySelector('div');
+                if (i === index) {
+                    btn.className = "flex flex-col items-center flex-1 py-1 text-[#0f2c59] font-bold";
+                    iconDiv.className = "w-9 h-9 rounded-xl bg-[#0f2c59]/10 flex items-center justify-center transition-all scale-105";
+                } else {
+                    btn.className = "flex flex-col items-center flex-1 py-1 text-slate-500 hover:text-slate-800";
+                    iconDiv.className = "w-9 h-9 rounded-xl flex items-center justify-center transition-all text-slate-500";
+                }
+            }
+
+            renderContent();
+        }
+
+        // --- Render Dynamic Content ---
+        function renderContent() {
+            const container = document.getElementById('app-content');
+            const data = tabsData[activeTabIndex];
+
+            if (data.isSchedule) {
+                renderScheduleTab(container);
+            } else if (data.isAttendance) {
+                renderAttendanceTab(container);
+            } else {
+                renderCardsTab(container, data.cards);
+            }
+        }
+
+        function renderCardsTab(container, cards) {
+            let html = '<div class="grid grid-cols-1 gap-3.5">';
+            cards.forEach(card => {
+                html += `
+                    <div onclick="triggerAction('${card.action}')" class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 hover:shadow-md transition-all cursor-pointer relative flex flex-col justify-between group">
+                        <div class="flex justify-between items-start mb-3">
+                            <div class="w-10 h-10 rounded-2xl ${card.iconBg} flex items-center justify-center text-base shadow-sm group-hover:scale-110 transition-transform">
+                                <i class="fa-solid ${card.icon}"></i>
+                            </div>
+                            <div class="w-9 h-9 rounded-2xl ${card.badgeBg} flex items-center justify-center font-bold text-sm">
+                                ${card.badge}
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">${card.title}</h3>
+                            <p class="text-slate-400 text-[11px] leading-relaxed line-clamp-2">${card.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function renderScheduleTab(container) {
+            let scheduleHtml = `
+                <div class="flex bg-white p-2 rounded-2xl shadow-sm mb-4 border border-slate-100 text-xs font-semibold gap-2">
+                    <div class="flex-1 text-center py-2.5 bg-[#0f2c59] text-white rounded-xl shadow-sm">
+                        <i class="fa-solid fa-table-cells ml-1"></i> جدول الحصص الأسبوعي
+                    </div>
+                    <button onclick="triggerAction('add_schedule_item')" class="flex-1 text-center py-2.5 bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-xl transition-colors font-bold">
+                        <i class="fa-solid fa-calendar-plus ml-1"></i> إضافة حصة
+                    </button>
+                </div>
+            `;
+
+            const days = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس"];
+            days.forEach(day => {
+                const dayClasses = appState.schedule.filter(s => s.day === day);
+                scheduleHtml += `
+                    <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 mb-4">
+                        <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
+                                    <i class="fa-solid fa-calendar-day"></i>
+                                </div>
+                                <span class="font-bold text-slate-800 text-sm">يوم ${day}</span>
+                            </div>
+                            <span class="text-[11px] bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full font-bold">${dayClasses.length} حصص</span>
+                        </div>
+                `;
+
+                if (dayClasses.length === 0) {
+                    scheduleHtml += `<p class="text-xs text-slate-400 text-center py-3">لا توجد حصص مضافة في هذا اليوم</p>`;
+                } else {
+                    dayClasses.forEach(item => {
+                        scheduleHtml += `
+                            <div class="bg-[#f8fafc] rounded-2xl p-3 mb-2.5 border border-slate-100 flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 font-bold flex items-center justify-center text-sm shadow-sm">${item.period}</div>
+                                    <div>
+                                        <h4 class="font-bold text-[#0f2c59] text-sm">${item.subject} <span class="text-xs font-normal text-slate-500">(${item.className})</span></h4>
+                                        <div class="flex items-center gap-3 mt-1 text-[11px] text-slate-500">
+                                            <span><i class="fa-regular fa-clock text-rose-500 ml-1"></i> ${item.time}</span>
+                                            <span><i class="fa-solid fa-location-dot text-rose-500 ml-1"></i> ${item.hall}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button onclick="deleteScheduleItem(${item.period}, '${day}')" class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100 transition-colors">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
+                            </div>
+                        `;
+                    });
+                }
+                scheduleHtml += `</div>`;
+            });
+
+            container.innerHTML = scheduleHtml;
+        }
+
+        // --- Attendance Tab (Form 1*2 Tabs Grid) ---
+        function renderAttendanceTab(container) {
+            let classOptions = appState.classes.map(c => `<option value="${c.name} - ${c.section}">${c.name} (شعبة ${c.section})</option>`).join('');
+            let subjectOptions = appState.subjects.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+
+            container.innerHTML = `
+                <!-- 1*2 Tabs Grid -->
+                <div class="grid grid-cols-2 gap-2.5 mb-4">
+                    <!-- Tab 1 Button -->
+                    <button onclick="setAttendanceSubTab('register')" class="p-3 rounded-2xl border text-right transition-all flex flex-col justify-between ${attendanceSubTab === 'register' ? 'bg-[#0f2c59] text-white border-[#0f2c59] shadow-md shadow-blue-950/20' : 'bg-white text-slate-700 border-slate-200/80 hover:bg-slate-50'}">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs ${attendanceSubTab === 'register' ? 'bg-white/20 text-white' : 'bg-blue-50 text-[#0f2c59]'}">
+                                <i class="fa-solid fa-clipboard-user"></i>
+                            </span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${attendanceSubTab === 'register' ? 'bg-amber-400 text-slate-900' : 'bg-slate-100 text-slate-500'}">1</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-xs leading-snug">تسجيل / تعديل الجلسة</h4>
+                            <p class="text-[10px] mt-0.5 leading-tight ${attendanceSubTab === 'register' ? 'text-slate-200' : 'text-slate-400'}">رصد الحضور وتعديل القوائم</p>
+                        </div>
+                    </button>
+
+                    <!-- Tab 2 Button -->
+                    <button onclick="setAttendanceSubTab('report')" class="p-3 rounded-2xl border text-right transition-all flex flex-col justify-between ${attendanceSubTab === 'report' ? 'bg-[#0f2c59] text-white border-[#0f2c59] shadow-md shadow-blue-950/20' : 'bg-white text-slate-700 border-slate-200/80 hover:bg-slate-50'}">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="w-7 h-7 rounded-xl flex items-center justify-center text-xs ${attendanceSubTab === 'report' ? 'bg-white/20 text-white' : 'bg-rose-50 text-rose-600'}">
+                                <i class="fa-solid fa-file-invoice"></i>
+                            </span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${attendanceSubTab === 'report' ? 'bg-amber-400 text-slate-900' : 'bg-slate-100 text-slate-500'}">2</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-xs leading-snug">تقرير الحضور والغياب</h4>
+                            <p class="text-[10px] mt-0.5 leading-tight ${attendanceSubTab === 'report' ? 'text-slate-200' : 'text-slate-400'}">تصدير PDF وطباعة رسمية</p>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Tab Details Content -->
+                <div id="attendance-subtab-content">
+                    ${attendanceSubTab === 'register' ? getAttendanceRegisterHTML(classOptions, subjectOptions) : getAttendanceReportHTML(classOptions)}
+                </div>
+            `;
+
+            if (attendanceSubTab === 'register') {
+                loadAttendanceList();
+            }
+        }
+
+        function setAttendanceSubTab(tab) {
+            attendanceSubTab = tab;
+            renderAttendanceTab(document.getElementById('app-content'));
+        }
+
+        function getAttendanceRegisterHTML(classOptions, subjectOptions) {
+            let sessionsOptions = appState.attendanceSessions.map(s => 
+                `<option value="${s.id}">${s.date} - ${s.class} (${s.section}) - ${s.subject}</option>`
+            ).join('');
+
+            return `
+                <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 mb-4">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="font-bold text-slate-800 text-xs flex items-center gap-1.5">
+                            <i class="fa-solid fa-sliders text-amber-500"></i> تفاصيل جلسة الحضور
+                        </h3>
+                        <span class="text-[10px] bg-blue-50 text-blue-700 px-2.5 py-0.5 rounded-full font-bold">تعديل مباشر</span>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">جلسة سابقة لتعديلها (اختياري):</label>
+                            <select id="att-existing-session" onchange="loadExistingSession(this.value)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-700 outline-none">
+                                <option value="new">-- تسجيل جلسة جديدة --</option>
+                                ${sessionsOptions}
+                            </select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">المرحلة والشعبة:</label>
+                                <select id="att-class-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-700 outline-none">
+                                    ${classOptions || '<option>لا توجد صفوف</option>'}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-600 mb-1">المادة الدراسية:</label>
+                                <select id="att-subject-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-700 outline-none">
+                                    ${subjectOptions || '<option>اللغة العربية</option>'}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">التاريخ:</label>
+                            <input type="date" id="att-date-select" value="${new Date().toISOString().split('T')[0]}" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-700 outline-none">
+                        </div>
+                        <button onclick="loadAttendanceList()" class="w-full bg-[#0f2c59] text-white py-2 rounded-xl font-bold text-xs shadow-md hover:bg-[#163a71] transition-colors">
+                            <i class="fa-solid fa-users ml-1"></i> فتح سجل الحضور والغياب (أبجدياً)
+                        </button>
+                    </div>
+                </div>
+
+                <div id="attendance-list-container"></div>
+            `;
+        }
+
+        function loadExistingSession(sessionId) {
+            if (sessionId === 'new') {
+                return;
+            }
+            const sess = appState.attendanceSessions.find(s => s.id === sessionId);
+            if (sess) {
+                document.getElementById('att-date-select').value = sess.date;
+                const classSelector = document.getElementById('att-class-select');
+                for (let i = 0; i < classSelector.options.length; i++) {
+                    if (classSelector.options[i].value.includes(sess.class) && classSelector.options[i].value.includes(sess.section)) {
+                        classSelector.selectedIndex = i;
+                        break;
+                    }
+                }
+                const subSelector = document.getElementById('att-subject-select');
+                for (let i = 0; i < subSelector.options.length; i++) {
+                    if (subSelector.options[i].value === sess.subject) {
+                        subSelector.selectedIndex = i;
+                        break;
+                    }
+                }
+                loadAttendanceList(sess);
+            }
+        }
+
+        function loadAttendanceList(existingSession = null) {
+            const classVal = document.getElementById('att-class-select').value;
+            const subjectVal = document.getElementById('att-subject-select').value;
+            const dateVal = document.getElementById('att-date-select').value;
+            const container = document.getElementById('attendance-list-container');
+
+            if (!classVal) {
+                showToast("الرجاء اختيار الصف أولاً", "error");
+                return;
+            }
+
+            const [className, sectionPart] = classVal.split(" - ");
+            const section = sectionPart ? sectionPart.trim() : "أ";
+
+            let filteredStudents = appState.students.filter(s => s.class.trim() === className.trim() && s.section.trim() === section.trim());
+            filteredStudents.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+
+            if (filteredStudents.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl p-6 text-center border border-slate-100">
+                        <i class="fa-solid fa-users-slash text-slate-300 text-3xl mb-2"></i>
+                        <p class="text-xs text-slate-500 font-semibold">لا يوجد طلاب في ${className} (شعبة ${section})</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sessionMatch = existingSession || appState.attendanceSessions.find(s => s.class === className.trim() && s.section === section.trim() && s.date === dateVal && s.subject === subjectVal);
+
+            let listHtml = `
+                <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100">
+                    <div class="flex justify-between items-center mb-3 pb-2 border-b border-slate-100">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-xs">${sessionMatch ? 'تعديل جلسة حضور مسجلة' : 'تسجيل حضور الطلاب'}</h4>
+                            <p class="text-[10px] text-slate-400">${className} (${section}) | ${subjectVal} | ${dateVal}</p>
+                        </div>
+                        <span class="text-[11px] bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-full font-bold">${filteredStudents.length} طالب</span>
+                    </div>
+                    <div class="space-y-2.5">
+            `;
+
+            filteredStudents.forEach((st, idx) => {
+                let status = "present";
+                if (sessionMatch && sessionMatch.records && sessionMatch.records[st.id]) {
+                    status = sessionMatch.records[st.id];
+                }
+
+                listHtml += `
+                    <div class="flex items-center justify-between bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-6 h-6 rounded-full bg-slate-200 text-slate-700 text-[11px] font-bold flex items-center justify-center">${idx + 1}</span>
+                            <div>
+                                <h5 class="font-bold text-slate-800 text-xs">${st.name}</h5>
+                                <span class="text-[10px] text-slate-400">${st.phone || 'بدون هاتف'}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-1.5" data-student-id="${st.id}">
+                            <button onclick="setAttendanceStatus(${st.id}, 'present', this)" class="att-btn-${st.id}-present px-3 py-1 rounded-xl text-[11px] font-bold transition-all ${status === 'present' ? 'bg-emerald-100 text-emerald-800 shadow-xs' : 'bg-slate-200 text-slate-600'}">حاضر</button>
+                            <button onclick="setAttendanceStatus(${st.id}, 'absent', this)" class="att-btn-${st.id}-absent px-3 py-1 rounded-xl text-[11px] font-bold transition-all ${status === 'absent' ? 'bg-rose-100 text-rose-800 shadow-xs' : 'bg-slate-200 text-slate-600'}">غائب</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            listHtml += `
+                    </div>
+                    <button onclick="saveAttendanceSession('${sessionMatch ? sessionMatch.id : ''}')" class="w-full mt-4 bg-emerald-600 text-white py-2.5 rounded-xl font-bold text-xs shadow-md hover:bg-emerald-700 transition-colors">
+                        <i class="fa-solid fa-floppy-disk ml-1"></i> ${sessionMatch ? 'حفظ تعديلات جلسة الحضور' : 'اعتماد وحفظ جلسة الحضور'}
+                    </button>
+                </div>
+            `;
+
+            container.innerHTML = listHtml;
+        }
+
+        function setAttendanceStatus(studentId, status, btnElement) {
+            const parent = btnElement.parentElement;
+            const buttons = parent.querySelectorAll('button');
+            buttons.forEach(b => {
+                b.className = "px-3 py-1 rounded-xl text-[11px] font-bold bg-slate-200 text-slate-600 transition-all";
+            });
+            if (status === 'present') {
+                btnElement.className = "px-3 py-1 rounded-xl text-[11px] font-bold bg-emerald-100 text-emerald-800 shadow-xs transition-all";
+            } else {
+                btnElement.className = "px-3 py-1 rounded-xl text-[11px] font-bold bg-rose-100 text-rose-800 shadow-xs transition-all";
+            }
+        }
+
+        function saveAttendanceSession(existingId) {
+            const classVal = document.getElementById('att-class-select').value;
+            const subjectVal = document.getElementById('att-subject-select').value;
+            const dateVal = document.getElementById('att-date-select').value;
+
+            const [className, sectionPart] = classVal.split(" - ");
+            const section = sectionPart ? sectionPart.trim() : "أ";
+
+            let records = {};
+            const buttonsWrap = document.querySelectorAll('[data-student-id]');
+            buttonsWrap.forEach(wrap => {
+                const sId = wrap.getAttribute('data-student-id');
+                const isAbsent = wrap.querySelector(`.att-btn-${sId}-absent`).classList.contains('bg-rose-100');
+                records[sId] = isAbsent ? 'absent' : 'present';
+            });
+
+            if (existingId) {
+                const idx = appState.attendanceSessions.findIndex(s => s.id === existingId);
+                if (idx !== -1) {
+                    appState.attendanceSessions[idx].records = records;
+                    appState.attendanceSessions[idx].date = dateVal;
+                }
+            } else {
+                appState.attendanceSessions.push({
+                    id: "session_" + Date.now(),
+                    date: dateVal,
+                    class: className.trim(),
+                    section: section.trim(),
+                    subject: subjectVal,
+                    records: records
+                });
+            }
+
+            showToast("تم حفظ وتعديل بيانات جلسة الحضور بنجاح!");
+            renderAttendanceTab(document.getElementById('app-content'));
+        }
+
+        // --- Attendance Report Subtab Details ---
+        function getAttendanceReportHTML(classOptions) {
+            return `
+                <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 mb-4">
+                    <h3 class="font-bold text-slate-800 text-xs mb-3 flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-pdf text-rose-600"></i> تفاصيل وفلاتر تقرير الغياب
+                    </h3>
+                    <div class="space-y-2.5">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">المرحلة والشعبة:</label>
+                            <select id="rep-class-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-700 outline-none">
+                                <option value="all">جميع الصفوف والشعب</option>
+                                ${classOptions}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">التاريخ أو اليوم المحدد:</label>
+                            <input type="date" id="rep-date-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs font-semibold text-slate-700 outline-none">
+                        </div>
+                        <div class="flex gap-2 pt-1">
+                            <button onclick="generateAttendanceReport()" class="flex-1 bg-[#0f2c59] text-white py-2 rounded-xl font-bold text-xs shadow-md hover:bg-[#163a71] transition-colors">
+                                <i class="fa-solid fa-magnifying-glass ml-1"></i> استخراج التقرير
+                            </button>
+                            <button onclick="printOrExportReport('attendance-report-view', 'تقرير الحضور والغياب')" class="bg-rose-50 text-rose-700 border border-rose-200 px-3 py-2 rounded-xl font-bold text-xs hover:bg-rose-100 transition-colors">
+                                <i class="fa-solid fa-print ml-1"></i> طباعة / PDF
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="attendance-report-view">
+                    <div class="bg-white rounded-3xl p-5 text-center border border-slate-100 text-xs text-slate-400">
+                        حدد معايير البحث واضغط "استخراج التقرير" لمعاينة البيانات وطباعتها.
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateAttendanceReport() {
+            const classVal = document.getElementById('rep-class-select').value;
+            const dateVal = document.getElementById('rep-date-select').value;
+            const container = document.getElementById('attendance-report-view');
+
+            let sessions = appState.attendanceSessions;
+            if (dateVal) {
+                sessions = sessions.filter(s => s.date === dateVal);
+            }
+            if (classVal !== 'all') {
+                const [cName, sPart] = classVal.split(" - ");
+                sessions = sessions.filter(s => s.class === cName.trim() && s.section === sPart.trim());
+            }
+
+            if (sessions.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-3xl p-6 text-center border border-slate-100">
+                        <i class="fa-solid fa-circle-exclamation text-amber-500 text-2xl mb-2"></i>
+                        <p class="text-xs text-slate-600 font-bold">لا توجد جلسات مسجلة لهذه المعايير</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let reportHTML = `
+                <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100 space-y-4">
+                    <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-[#0f2c59] text-sm">تقرير الغياب والحضور الرسمي</h4>
+                            <p class="text-[10px] text-slate-400">${dateVal ? 'تاريخ: ' + dateVal : 'جميع التواريخ المسجلة'}</p>
+                        </div>
+                        <span class="text-[11px] bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full font-bold">${sessions.length} جلسات</span>
+                    </div>
+            `;
+
+            sessions.forEach(sess => {
+                const absentIds = Object.keys(sess.records || {}).filter(id => sess.records[id] === 'absent');
+                const presentCount = Object.keys(sess.records || {}).length - absentIds.length;
+
+                reportHTML += `
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-xs text-slate-800">${sess.class} (${sess.section}) - ${sess.subject}</span>
+                            <span class="text-[10px] text-slate-500">${sess.date}</span>
+                        </div>
+                        <div class="flex gap-2 text-[10px] mb-2">
+                            <span class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md font-bold">حاضر: ${presentCount}</span>
+                            <span class="bg-rose-100 text-rose-800 px-2 py-0.5 rounded-md font-bold">غائب: ${absentIds.length}</span>
+                        </div>
+                        <div class="text-[11px] text-slate-700">
+                            <strong>الطلاب الغائبون:</strong> 
+                            ${absentIds.length > 0 ? absentIds.map(id => {
+                                const st = appState.students.find(s => s.id == id);
+                                return `<span class="inline-block bg-rose-50 text-rose-700 px-2 py-0.5 rounded-lg border border-rose-200 ml-1 mt-1 font-semibold">${st ? st.name : 'طالب #' + id}</span>`;
+                            }).join('') : '<span class="text-emerald-600 font-semibold">لا يوجد غياب (حضور كامل)</span>'}
+                        </div>
+                    </div>
+                `;
+            });
+
+            reportHTML += `</div>`;
+            container.innerHTML = reportHTML;
+        }
+
+        // --- Print & Export PDF Helper ---
+        function printOrExportReport(containerId, title = "تقرير") {
+            const printContent = document.getElementById(containerId);
+            if (!printContent) {
+                showToast("لا يوجد تقرير لطباعته", "error");
+                return;
+            }
+            const printArea = document.getElementById('printable-area');
+            printArea.innerHTML = `
+                <div style="direction: rtl; text-align: right; padding: 20px;">
+                    <div style="text-align: center; margin-bottom: 20px; border-bottom: 2px solid #0f2c59; padding-bottom: 10px;">
+                        <h2 style="font-size: 20px; font-weight: bold; color: #0f2c59; margin: 0;">وزارة التربية والتعليم - منظومة المعلم الذكي</h2>
+                        <h3 style="font-size: 16px; margin: 5px 0;">${title}</h3>
+                        <p style="font-size: 12px; color: #666; margin: 0;">تاريخ التصدير: ${new Date().toLocaleDateString('ar-IQ')}</p>
+                    </div>
+                    ${printContent.innerHTML}
+                </div>
+            `;
+            window.print();
+        }
+
+        // --- Modals & Handlers ---
+        function triggerAction(actionKey) {
+            currentModalType = actionKey;
+            const modal = document.getElementById('action-modal');
+            const box = document.getElementById('modal-box');
+            const titleEl = document.getElementById('modal-title');
+            const bodyEl = document.getElementById('modal-body');
+            const iconEl = document.getElementById('modal-icon');
+            const submitBtn = document.getElementById('modal-submit-btn');
+
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-95');
+            box.classList.add('scale-100');
+            submitBtn.style.display = 'block';
+
+            if (actionKey === 'manage_classes') {
+                titleEl.innerText = "إدارة الصفوف والشعب";
+                iconEl.className = "fa-solid fa-book";
+                renderManageClassesModal(bodyEl);
+            } else if (actionKey === 'student_dossier') {
+                titleEl.innerText = "إضبارة الطالب الشاملة";
+                iconEl.className = "fa-solid fa-id-card";
+                submitBtn.style.display = 'none';
+                renderStudentDossierModal(bodyEl);
+            } else if (actionKey === 'add_student') {
+                titleEl.innerText = "سجل الطلاب (إضافة)";
+                iconEl.className = "fa-solid fa-user-check";
+                let classDropdowns = appState.classes.map(c => `<option value="${c.name} - ${c.section}">${c.name} (شعبة ${c.section})</option>`).join('');
+
+                bodyEl.innerHTML = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">اسم الطالب (الرباعي):</label>
+                            <input id="inp-std-name" type="text" placeholder="مثال: علي كريم ناصر محسن" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-blue-900">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">رقم الهاتف:</label>
+                            <input id="inp-std-phone" type="text" placeholder="07xxxxxxxxx" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-blue-900">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">المرحلة والشعبة:</label>
+                            <select id="inp-std-class" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none focus:border-blue-900">
+                                ${classDropdowns || '<option>أضف صفاً أولاً</option>'}
+                            </select>
+                        </div>
+                    </div>
+                `;
+            } else if (actionKey === 'behavior_eval') {
+                titleEl.innerText = "تقييم السلوك والانضباط";
+                iconEl.className = "fa-solid fa-star";
+                renderBehaviorModal(bodyEl);
+            } else if (actionKey === 'individual_notes') {
+                titleEl.innerText = "الملاحظات الفردية للطلاب";
+                iconEl.className = "fa-solid fa-user-pen";
+                renderIndividualNotesModal(bodyEl);
+            } else if (actionKey === 'comprehensive_report') {
+                titleEl.innerText = "كشف المتابعة الشامل";
+                iconEl.className = "fa-solid fa-chart-pie";
+                submitBtn.style.display = 'none';
+                renderComprehensiveReportModal(bodyEl);
+            } else if (actionKey === 'import_students') {
+                titleEl.innerText = "استيراد الأسماء";
+                iconEl.className = "fa-solid fa-right-left";
+                bodyEl.innerHTML = `
+                    <div class="space-y-3 text-xs">
+                        <div class="bg-teal-50 p-3 rounded-2xl text-[11px] text-teal-800 font-semibold">
+                            الصق قائمة الأسماء (كل اسم في سطر مستقل):
+                        </div>
+                        <div>
+                            <textarea id="inp-bulk-names" rows="5" placeholder="أحمد علي&#10;حسين كريم&#10;زينب حسن" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 outline-none"></textarea>
+                        </div>
+                        <button onclick="executeBulkImport()" class="w-full bg-teal-600 text-white py-2 rounded-xl font-bold">استيراد الأسماء الآن</button>
+                    </div>
+                `;
+            } else if (actionKey === 'add_subject') {
+                titleEl.innerText = "إضافة مادة دراسية";
+                iconEl.className = "fa-solid fa-book-bookmark";
+                let classDropdowns = appState.classes.map(c => `<option value="${c.name} - ${c.section}">${c.name} (شعبة ${c.section})</option>`).join('');
+
+                bodyEl.innerHTML = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">اسم المادة الدراسية:</label>
+                            <input id="inp-sub-name" type="text" placeholder="مثال: الرياضيات" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">المرحلة المخصصة:</label>
+                            <select id="inp-sub-class" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                                ${classDropdowns}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">اسم الأستاذ:</label>
+                            <input id="inp-sub-teacher" type="text" placeholder="اسم المعلم" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                        </div>
+                    </div>
+                `;
+            } else if (actionKey === 'add_schedule_item') {
+                titleEl.innerText = "إضافة حصة للجدول";
+                iconEl.className = "fa-solid fa-calendar-plus";
+                let subjectOptions = appState.subjects.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+
+                bodyEl.innerHTML = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">اليوم:</label>
+                            <select id="sch-day" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                                <option value="الأحد">الأحد</option>
+                                <option value="الإثنين">الإثنين</option>
+                                <option value="الثلاثاء">الثلاثاء</option>
+                                <option value="الأربعاء">الأربعاء</option>
+                                <option value="الخميس">الخميس</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">رقم الحصة:</label>
+                            <input id="sch-period" type="number" min="1" max="7" value="1" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">المادة الدراسية:</label>
+                            <select id="sch-subject" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                                ${subjectOptions || '<option>اللغة العربية</option>'}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">الصف والشعبة:</label>
+                            <input id="sch-class" type="text" placeholder="الأول المتوسط (أ)" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 mb-1">الوقت:</label>
+                            <input id="sch-time" type="text" placeholder="08:00 - 08:45" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                        </div>
+                    </div>
+                `;
+            } else {
+                titleEl.innerText = "قسم الإعدادات والخدمات";
+                iconEl.className = "fa-solid fa-circle-check";
+                submitBtn.style.display = 'none';
+                bodyEl.innerHTML = `
+                    <div class="text-center py-6">
+                        <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mx-auto mb-3">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-800 text-sm mb-1">الخدمة السحابية مفعلة</h4>
+                        <p class="text-xs text-slate-400">النظام متصل ويقوم بالنسخ الاحتياطي ومزامنة التراخيص تلقائياً.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // --- Class Management ---
+        function renderManageClassesModal(container) {
+            editingClassId = null;
+            let classListHTML = appState.classes.map(c => {
+                const count = appState.students.filter(s => s.class === c.name && s.section === c.section).length;
+                return `
+                    <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-2xl border border-slate-100 text-xs">
+                        <div>
+                            <span class="font-bold text-slate-800">${c.name}</span>
+                            <span class="text-indigo-600 font-semibold mr-1">(شعبة ${c.section})</span>
+                            <span class="text-[10px] text-slate-400 block">${count} طالب مسجل</span>
+                        </div>
+                        <div class="flex gap-1.5">
+                            <button onclick="editClass(${c.id})" class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center hover:bg-amber-100">
+                                <i class="fa-solid fa-pen text-[10px]"></i>
+                            </button>
+                            <button onclick="deleteClass(${c.id})" class="w-7 h-7 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center hover:bg-rose-100">
+                                <i class="fa-solid fa-trash text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div class="bg-indigo-50/70 p-3 rounded-2xl border border-indigo-100">
+                        <span id="class-form-title" class="font-bold text-xs text-indigo-900 block mb-2">إضافة مرحلة وشعبة جديدة:</span>
+                        <div class="space-y-2">
+                            <input id="inp-class-name" type="text" placeholder="اسم المرحلة (مثلاً: الثالث المتوسط)" class="w-full bg-white border border-indigo-200 rounded-xl p-2 text-xs outline-none">
+                            <input id="inp-class-section" type="text" placeholder="الشعبة (مثلاً: أ أو ب)" class="w-full bg-white border border-indigo-200 rounded-xl p-2 text-xs outline-none">
+                            <button id="save-class-btn" onclick="saveClassAction()" class="w-full bg-indigo-600 text-white py-2 rounded-xl font-bold text-xs shadow-sm hover:bg-indigo-700">
+                                <i class="fa-solid fa-plus ml-1"></i> حفظ الصف والشعبة
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 class="font-bold text-xs text-slate-700 mb-2">قائمة الصفوف والشعب الحالية:</h4>
+                        <div class="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+                            ${classListHTML || '<p class="text-xs text-slate-400 text-center py-2">لا توجد صفوف مضافة</p>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function editClass(id) {
+            const cls = appState.classes.find(c => c.id === id);
+            if (!cls) return;
+            editingClassId = id;
+            document.getElementById('class-form-title').innerText = "تعديل الصف والشعبة:";
+            document.getElementById('inp-class-name').value = cls.name;
+            document.getElementById('inp-class-section').value = cls.section;
+            const btn = document.getElementById('save-class-btn');
+            btn.innerHTML = `<i class="fa-solid fa-pen-to-square ml-1"></i> تعديل بيانات الصف`;
+            btn.className = "w-full bg-amber-600 text-white py-2 rounded-xl font-bold text-xs shadow-sm hover:bg-amber-700";
+        }
+
+        function deleteClass(id) {
+            if (confirm("هل أنت متأكد من حذف هذا الصف والشعبة؟")) {
+                appState.classes = appState.classes.filter(c => c.id !== id);
+                showToast("تم حذف الصف بنجاح");
+                renderManageClassesModal(document.getElementById('modal-body'));
+            }
+        }
+
+        function saveClassAction() {
+            const name = document.getElementById('inp-class-name').value.trim();
+            const section = document.getElementById('inp-class-section').value.trim();
+            if (!name || !section) {
+                showToast("الرجاء إدخال اسم الصف والشعبة", "error");
+                return;
+            }
+
+            if (editingClassId) {
+                const cls = appState.classes.find(c => c.id === editingClassId);
+                if (cls) {
+                    cls.name = name;
+                    cls.section = section;
+                    showToast("تم تعديل الصف والشعبة بنجاح");
+                }
+                editingClassId = null;
+            } else {
+                appState.classes.push({ id: Date.now(), name, section });
+                showToast("تمت إضافة الصف والشعبة بنجاح");
+            }
+
+            renderManageClassesModal(document.getElementById('modal-body'));
+        }
+
+        // --- Student Dossier ---
+        function renderStudentDossierModal(container) {
+            let classOptions = appState.classes.map(c => `<option value="${c.name} - ${c.section}">${c.name} (شعبة ${c.section})</option>`).join('');
+
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div class="bg-amber-50 p-2.5 rounded-2xl border border-amber-200 text-xs">
+                        <label class="block font-bold text-amber-900 mb-1">تحديد الصف والشعبة:</label>
+                        <select id="dos-class-select" onchange="filterDossierStudents()" class="w-full bg-white border border-amber-300 rounded-xl p-2 text-xs outline-none">
+                            <option value="all">جميع الصفوف والشعب</option>
+                            ${classOptions}
+                        </select>
+                        <div class="mt-2 relative">
+                            <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-slate-400 text-xs"></i>
+                            <input id="dos-search-input" onkeyup="filterDossierStudents()" type="text" placeholder="ابحث باسم الطالب مباشرة..." class="w-full bg-white border border-amber-300 rounded-xl pr-8 pl-3 py-1.5 text-xs outline-none">
+                        </div>
+                    </div>
+
+                    <div id="dos-students-list" class="space-y-2 max-h-40 overflow-y-auto no-scrollbar">
+                        <!-- Student list items -->
+                    </div>
+
+                    <div id="dos-student-report" class="hidden bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
+                        <!-- Student dossier detail -->
+                    </div>
+                </div>
+            `;
+            filterDossierStudents();
+        }
+
+        function filterDossierStudents() {
+            const classVal = document.getElementById('dos-class-select').value;
+            const searchVal = document.getElementById('dos-search-input').value.trim().toLowerCase();
+            const listContainer = document.getElementById('dos-students-list');
+
+            let filtered = appState.students;
+            if (classVal !== 'all') {
+                const [cName, sPart] = classVal.split(" - ");
+                filtered = filtered.filter(s => s.class === cName.trim() && s.section === sPart.trim());
+            }
+            if (searchVal) {
+                filtered = filtered.filter(s => s.name.toLowerCase().includes(searchVal));
+            }
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `<p class="text-xs text-slate-400 text-center py-2">لا يوجد طلاب مطابقين للبحث</p>`;
+                return;
+            }
+
+            listContainer.innerHTML = filtered.map(s => `
+                <div onclick="showStudentDossierDetail(${s.id})" class="p-2 bg-white rounded-xl border border-slate-200 flex justify-between items-center cursor-pointer hover:border-amber-400 transition-colors">
+                    <div>
+                        <h5 class="font-bold text-slate-800">${s.name}</h5>
+                        <span class="text-[10px] text-slate-400">${s.class} (${s.section})</span>
+                    </div>
+                    <span class="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-lg font-bold">عرض الإضبارة</span>
+                </div>
+            `).join('');
+        }
+
+        function showStudentDossierDetail(studentId) {
+            const student = appState.students.find(s => s.id === studentId);
+            if (!student) return;
+
+            let totalSessions = 0;
+            let absences = 0;
+            appState.attendanceSessions.forEach(sess => {
+                if (sess.class === student.class && sess.section === student.section) {
+                    if (sess.records && sess.records[student.id]) {
+                        totalSessions++;
+                        if (sess.records[student.id] === 'absent') absences++;
+                    }
+                }
+            });
+
+            const behaviors = appState.behaviorRecords.filter(b => b.studentId === student.id);
+            const notes = appState.individualNotes.filter(n => n.studentId === student.id);
+
+            const reportContainer = document.getElementById('dos-student-report');
+            reportContainer.classList.remove('hidden');
+
+            reportContainer.innerHTML = `
+                <div id="student-single-dossier" class="space-y-3">
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                        <div>
+                            <h4 class="font-bold text-sm text-[#0f2c59]">${student.name}</h4>
+                            <p class="text-[10px] text-slate-500">${student.class} - شعبة ${student.section} | هاتف: ${student.phone || 'غير مسجل'}</p>
+                        </div>
+                        <button onclick="printOrExportReport('student-single-dossier', 'إضبارة الطالب - ' + '${student.name}')" class="bg-amber-600 text-white px-2.5 py-1.5 rounded-xl font-bold text-[10px] hover:bg-amber-700 transition-colors">
+                            <i class="fa-solid fa-print ml-1"></i> طباعة / PDF
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 text-[10px]">
+                        <div class="bg-white p-2 rounded-xl border border-slate-200 text-center">
+                            <span class="text-slate-400 block">مرات الغياب</span>
+                            <span class="text-base font-bold text-rose-600">${absences} يوم</span>
+                        </div>
+                        <div class="bg-white p-2 rounded-xl border border-slate-200 text-center">
+                            <span class="text-slate-400 block">نسبة الالتزام</span>
+                            <span class="text-base font-bold text-emerald-600">${totalSessions > 0 ? Math.round(((totalSessions - absences) / totalSessions) * 100) : 100}%</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="font-bold text-slate-700 block mb-1 text-[11px]">السجل السلوكي:</span>
+                        ${behaviors.length > 0 ? behaviors.map(b => `
+                            <div class="bg-white p-1.5 rounded-lg border border-slate-100 text-[10px] mb-1 flex justify-between">
+                                <span>${b.rating}</span>
+                                <span class="text-amber-500">${'★'.repeat(b.stars)}</span>
+                            </div>
+                        `).join('') : '<p class="text-[10px] text-slate-400">لا توجد سجلات سلوكية مدخلة</p>'}
+                    </div>
+
+                    <div>
+                        <span class="font-bold text-slate-700 block mb-1 text-[11px]">الملاحظات الفردية:</span>
+                        ${notes.length > 0 ? notes.map(n => `
+                            <div class="bg-white p-1.5 rounded-lg border border-slate-100 text-[10px] mb-1">
+                                <span class="font-bold ${n.type.includes('متميز') ? 'text-emerald-600' : 'text-amber-600'}">${n.type}:</span>
+                                <span>${n.text}</span>
+                            </div>
+                        `).join('') : '<p class="text-[10px] text-slate-400">لا توجد ملاحظات فردية</p>'}
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Behavior Modal ---
+        function renderBehaviorModal(container) {
+            let classOptions = appState.classes.map(c => `<option value="${c.name} - ${c.section}">${c.name} (شعبة ${c.section})</option>`).join('');
+
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">المرحلة والشعبة:</label>
+                        <select id="beh-class-select" onchange="updateBehaviorStudentList()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                            ${classOptions}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">اختر الطالب:</label>
+                        <select id="beh-student-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                            <!-- Injected dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">التقييم بالنجوم:</label>
+                        <select id="beh-stars" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                            <option value="5">★★★★★ (ممتاز جداً)</option>
+                            <option value="4">★★★★☆ (جيد جداً)</option>
+                            <option value="3">★★★☆☆ (متوسط)</option>
+                            <option value="2">★★☆☆☆ (يحتاج توجيه)</option>
+                            <option value="1">★☆☆☆☆ (ضعيف)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">وصف السلوك والانضباط:</label>
+                        <input id="beh-rating" type="text" placeholder="مثال: التزام عالي وهدوء داخل القاعة" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                    </div>
+                </div>
+            `;
+            updateBehaviorStudentList();
+        }
+
+        function updateBehaviorStudentList() {
+            const classVal = document.getElementById('beh-class-select').value;
+            const [className, section] = classVal.split(" - ");
+            const selectEl = document.getElementById('beh-student-select');
+
+            const filtered = appState.students.filter(s => s.class === className.trim() && s.section === section.trim());
+            selectEl.innerHTML = filtered.map(s => `<option value="${s.id}">${s.name}</option>`).join('') || '<option value="">لا يوجد طلاب</option>';
+        }
+
+        // --- Individual Notes Modal ---
+        function renderIndividualNotesModal(container) {
+            let studentOptions = appState.students.map(s => `<option value="${s.id}">${s.name} (${s.class} - ${s.section})</option>`).join('');
+
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">اختر الطالب:</label>
+                        <select id="note-student-select" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                            ${studentOptions}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">نوع الملاحظة:</label>
+                        <select id="note-type" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none">
+                            <option value="متميز / شاطر">🌟 متميز / شاطر</option>
+                            <option value="يحتاج متابعة">⚠️ يحتاج متابعة</option>
+                            <option value="ملاحظة صحية / عائلية">ℹ️ ملاحظة صحية أو خاصة</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-600 mb-1">نص الملاحظة الفردية:</label>
+                        <textarea id="note-text" rows="3" placeholder="اكتب الملاحظة الفردية الخاصة بهذا الطالب هنا..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs outline-none"></textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Comprehensive Report Modal ---
+        function renderComprehensiveReportModal(container) {
+            let classOptions = appState.classes.map(c => `<option value="${c.name} - ${c.section}">${c.name} (شعبة ${c.section})</option>`).join('');
+
+            container.innerHTML = `
+                <div class="space-y-3">
+                    <div class="flex gap-2">
+                        <select id="comp-class-select" onchange="generateComprehensiveReportData()" class="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-2 text-xs outline-none">
+                            ${classOptions}
+                        </select>
+                        <button onclick="printOrExportReport('comp-report-content', 'كشف المتابعة الشامل للسلوك والملاحظات')" class="bg-purple-600 text-white px-3 py-2 rounded-xl font-bold text-xs hover:bg-purple-700 transition-colors">
+                            <i class="fa-solid fa-print ml-1"></i> طباعة / PDF
+                        </button>
+                    </div>
+
+                    <div id="comp-report-content" class="space-y-2.5 max-h-80 overflow-y-auto no-scrollbar">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+            `;
+            generateComprehensiveReportData();
+        }
+
+        function generateComprehensiveReportData() {
+            const classVal = document.getElementById('comp-class-select').value;
+            const container = document.getElementById('comp-report-content');
+            const [className, section] = classVal.split(" - ");
+
+            const filteredStudents = appState.students.filter(s => s.class === className.trim() && s.section === section.trim());
+
+            if (filteredStudents.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">لا يوجد طلاب في هذا الصف</p>`;
+                return;
+            }
+
+            container.innerHTML = filteredStudents.map(st => {
+                const behaviors = appState.behaviorRecords.filter(b => b.studentId === st.id);
+                const notes = appState.individualNotes.filter(n => n.studentId === st.id);
+
+                return `
+                    <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
+                        <div class="flex justify-between items-center mb-1.5 pb-1 border-b border-slate-200">
+                            <span class="font-bold text-[#0f2c59]">${st.name}</span>
+                            <span class="text-[10px] text-slate-400">${className} (${section})</span>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="text-[11px]">
+                                <span class="font-semibold text-amber-700">تقييم السلوك:</span>
+                                ${behaviors.length > 0 ? behaviors.map(b => `<span class="bg-amber-100 text-amber-900 px-1.5 py-0.5 rounded text-[10px] mr-1">${b.rating} (${b.stars}★)</span>`).join('') : '<span class="text-slate-400 text-[10px]">لا يوجد تقييم</span>'}
+                            </div>
+                            <div class="text-[11px]">
+                                <span class="font-semibold text-emerald-700">الملاحظات:</span>
+                                ${notes.length > 0 ? notes.map(n => `<span class="bg-white border border-slate-200 px-1.5 py-0.5 rounded text-[10px] block mt-1">${n.type}:${n.text}</span>`).join('') : '<span class="text-slate-400 text-[10px]">لا توجد ملاحظات</span>'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // --- Handle General Modal Submission ---
+        function handleModalSubmit() {
+            if (currentModalType === 'add_student') {
+                const name = document.getElementById('inp-std-name').value.trim();
+                const phone = document.getElementById('inp-std-phone').value.trim();
+                const classVal = document.getElementById('inp-std-class').value;
+                if (!name || !classVal) {
+                    showToast("الرجاء إدخال اسم الطالب والمرحلة", "error");
+                    return;
+                }
+                const [className, sectionPart] = classVal.split(" - ");
+                const section = sectionPart ? sectionPart.trim() : "أ";
+
+                appState.students.push({ id: Date.now(), name, phone, class: className, section });
+                showToast("تمت إضافة الطالب بنجاح");
+            } else if (currentModalType === 'behavior_eval') {
+                const sId = parseInt(document.getElementById('beh-student-select').value);
+                const stars = parseInt(document.getElementById('beh-stars').value);
+                const rating = document.getElementById('beh-rating').value.trim() || "تقييم اعتيادي";
+
+                if (!sId) {
+                    showToast("الرجاء اختيار الطالب", "error");
+                    return;
+                }
+                appState.behaviorRecords.push({
+                    id: Date.now(),
+                    studentId: sId,
+                    stars: stars,
+                    rating: rating,
+                    date: new Date().toISOString().split('T')[0]
+                });
+                showToast("تم حفظ تقييم السلوك بنجاح");
+            } else if (currentModalType === 'individual_notes') {
+                const sId = parseInt(document.getElementById('note-student-select').value);
+                const type = document.getElementById('note-type').value;
+                const text = document.getElementById('note-text').value.trim();
+
+                if (!sId || !text) {
+                    showToast("الرجاء كتابة الملاحظة واختيار الطالب", "error");
+                    return;
+                }
+                appState.individualNotes.push({
+                    id: Date.now(),
+                    studentId: sId,
+                    type: type,
+                    text: text,
+                    date: new Date().toISOString().split('T')[0]
+                });
+                showToast("تم توثيق الملاحظة الفردية بنجاح");
+            } else if (currentModalType === 'add_subject') {
+                const name = document.getElementById('inp-sub-name').value.trim();
+                const classVal = document.getElementById('inp-sub-class').value;
+                const teacher = document.getElementById('inp-sub-teacher').value.trim();
+                if (!name) {
+                    showToast("الرجاء إدخال اسم المادة", "error");
+                    return;
+                }
+                appState.subjects.push({ id: Date.now(), name, class: classVal, teacher });
+                showToast("تمت إضافة المادة الدراسية بنجاح");
+            } else if (currentModalType === 'add_schedule_item') {
+                const day = document.getElementById('sch-day').value;
+                const period = parseInt(document.getElementById('sch-period').value);
+                const subject = document.getElementById('sch-subject').value;
+                const className = document.getElementById('sch-class').value;
+                const time = document.getElementById('sch-time').value || "08:00 - 08:45";
+
+                appState.schedule.push({ day, period, subject, className, time, hall: "قاعة عامة" });
+                showToast("تمت إضافة الحصة للجدول الأسبوعي");
+            } else {
+                showToast("تم حفظ البيانات بنجاح");
+            }
+
+            closeModal();
+            renderContent();
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('action-modal');
+            const box = document.getElementById('modal-box');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            box.classList.remove('scale-100');
+            box.classList.add('scale-95');
+        }
+
+        function executeBulkImport() {
+            const text = document.getElementById('inp-bulk-names').value;
+            if (!text.trim()) {
+                showToast("الرجاء لصق الأسماء أولاً", "error");
+                return;
+            }
+            const lines = text.split('\n');
+            let addedCount = 0;
+            lines.forEach(line => {
+                if (line.trim()) {
+                    appState.students.push({
+                        id: Date.now() + Math.random(),
+                        name: line.trim(),
+                        phone: "07xxxxxxxx",
+                        class: "الأول المتوسط",
+                        section: "أ"
+                    });
+                    addedCount++;
+                }
+            });
+            showToast(`تم استيراد ${addedCount} طالباً بنجاح دفعة واحدة!`);
+            closeModal();
+        }
+
+        function deleteScheduleItem(period, day) {
+            appState.schedule = appState.schedule.filter(s => !(s.period === period && s.day === day));
+            showToast("تم حذف الحصة بنجاح");
+            renderContent();
+        }
+
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
+            toast.classList.add('translate-y-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+                toast.classList.remove('translate-y-0');
+            }, 3000);
+        }
+
+        // Initialize App on Load
+        window.onload = function() {
+            switchTab(1); // Start on "الصفوف والطلاب" tab
+        };
+    </script>
+
+</body>
+</html>
